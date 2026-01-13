@@ -1,332 +1,471 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useSpring, useMotionValue, useMotionTemplate } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
-import { LucideMenu, LucideSearch, LucideArrowRight, LucideMapPin, LucideBed, LucideBath, LucideMaximize, LucideArrowUpRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { ArrowUpRight, Search, MapPin, Menu, ArrowRight, Phone, Plus, Shield, Coins, Globe, Users, CheckCircle } from 'lucide-react';
 
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://xyzcompany.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'public-anon-key';
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-// --- Components ---
-
-const Navbar = () => {
-  return (
-    <nav className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-6 md:px-12 md:py-8 text-white mix-blend-difference">
-      <div className="text-2xl font-serif tracking-tighter">LUXE.ESTATE</div>
-      <div className="hidden md:flex gap-8 text-xs uppercase tracking-widest font-medium">
-        {['Buy', 'Rent', 'Sell', 'Journal'].map((item) => (
-          <a key={item} href="#" className="relative group overflow-hidden">
-            <span className="block translate-y-0 group-hover:-translate-y-full transition-transform duration-500 ease-in-out">{item}</span>
-            <span className="absolute top-full left-0 block translate-y-0 group-hover:-translate-y-full transition-transform duration-500 ease-in-out">{item}</span>
-          </a>
-        ))}
-      </div>
-      <div className="flex items-center gap-6">
-        <LucideSearch className="w-5 h-5 cursor-pointer hover:opacity-70 transition-opacity" />
-        <div className="group cursor-pointer flex flex-col gap-1.5 w-8 items-end">
-            <span className="w-8 h-[1px] bg-white group-hover:w-6 transition-all duration-300"></span>
-            <span className="w-5 h-[1px] bg-white group-hover:w-8 transition-all duration-300"></span>
-        </div>
-      </div>
-    </nav>
-  );
+// --- ANIMATION CONSTANTS ---
+const FADE_UP = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
 };
 
-const MagneticButton = ({ children, className = "" }) => {
-    const ref = useRef(null);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-
-    const handleMouseMove = (e) => {
-        const { clientX, clientY } = e;
-        const { left, top, width, height } = ref.current.getBoundingClientRect();
-        const x = clientX - (left + width / 2);
-        const y = clientY - (top + height / 2);
-        setPosition({ x: x * 0.1, y: y * 0.1 });
-    };
-
-    const handleMouseLeave = () => {
-        setPosition({ x: 0, y: 0 });
-    };
-
-    const { x, y } = position;
-
-    return (
-        <motion.button
-            ref={ref}
-            className={`relative overflow-hidden ${className}`}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            animate={{ x, y }}
-            transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-        >
-            {children}
-        </motion.button>
-    );
+const STAGGER_CHILDREN = {
+  visible: { transition: { staggerChildren: 0.1 } }
 };
 
+const MARQUEE_VARIANTS = {
+  animate: {
+    x: [0, -1035],
+    transition: {
+      x: {
+        repeat: Infinity,
+        repeatType: "loop",
+        duration: 25,
+        ease: "linear",
+      },
+    },
+  },
+};
 
+// --- IMAGES ---
+const IMAGES = {
+  hero: "https://images.unsplash.com/photo-1512453979798-5ea904ac8489?q=80&w=2000&auto=format&fit=crop",
+  villa: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=2600&auto=format&fit=crop",
+  penthouse: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2600&auto=format&fit=crop",
+  apartment: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2600&auto=format&fit=crop",
+  waterfront: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=2600&auto=format&fit=crop",
+  golf: "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?q=80&w=2600&auto=format&fit=crop",
+  commercial: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2600&auto=format&fit=crop",
+  team1: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop",
+  team2: "https://images.unsplash.com/photo-1573496359-136d4755f324?q=80&w=200&auto=format&fit=crop",
+  team3: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop",
+  map: "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2600&auto=format&fit=crop" // Abstract map feel
+};
+
+// --- COMPONENT: HERO SECTION ---
 const Hero = () => {
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 1000], [0, 400]);
-  const y2 = useTransform(scrollY, [0, 1000], [0, -150]);
-  const opacity = useTransform(scrollY, [0, 500], [1, 0]);
-
   return (
-    <header className="relative w-full h-[120vh] overflow-hidden bg-obsidian text-alabaster">
-      <motion.div style={{ y: y1 }} className="absolute inset-0 w-full h-full">
-        <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover opacity-60"
-        >
-            <source src="https://cdn.dribbble.com/userupload/13861946/file/original-34b3b1bf3a8a8b7ce8c3d28e40d9f03f.mp4" type="video/mp4" />
-        </video>
-      </motion.div>
-      
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
-
-      <motion.div 
-        style={{ y: y2, opacity }}
-        className="absolute bottom-32 left-6 md:left-12 w-full max-w-[90vw] md:max-w-[80vw] z-10"
-      >
-        <div className="overflow-hidden">
-            <motion.h1 
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                className="text-[12vw] md:text-[8vw] font-serif leading-[0.85] tracking-tight mb-8"
-            >
-            Beyond <br/> <span className="italic font-light ml-[10vw]">Expectation</span>
-            </motion.h1>
-        </div>
-        
-        <div className="flex flex-col md:flex-row gap-8 items-start md:items-end border-t border-white/20 pt-8 mt-12 w-full md:w-3/4">
-          <motion.p 
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.8, delay: 0.8 }}
-             className="text-lg md:text-xl font-light max-w-md text-zinc-300"
-          >
-            Curating the world's most exceptional properties. Where architectural mastery meets unrivaled living.
-          </motion.p>
+    <section className="relative min-h-[90vh] flex flex-col md:flex-row p-4 md:p-8 gap-4 bg-[#F9F9F7] overflow-hidden">
+      {/* Left Content */}
+      <div className="flex-1 flex flex-col justify-center px-4 md:px-12 pt-20 md:pt-0 relative z-10">
+        <motion.div initial="hidden" animate="visible" variants={STAGGER_CHILDREN}>
+          <motion.h3 variants={FADE_UP} className="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-6 flex items-center gap-2">
+            <span className="w-8 h-[1px] bg-gray-400"></span>
+            Building Your Dreams
+          </motion.h3>
+          <motion.h1 variants={FADE_UP} className="text-5xl md:text-8xl font-sans font-medium text-[#1A1A1A] leading-[0.95] mb-8 tracking-tight">
+            Real Estate <br />
+            <span className="text-gray-300 italic font-serif pr-4">in Dubai:</span> <br />
+            Ideal for Living
+          </motion.h1>
           
-          <MagneticButton className="group flex items-center gap-4 text-sm uppercase tracking-widest hover:text-white/80 transition-colors px-8 py-4 border border-white/20 rounded-full bg-white/5 backdrop-blur-sm">
-             Explore Collection
-             <LucideArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </MagneticButton>
-        </div>
+          <motion.div variants={FADE_UP} className="flex flex-wrap items-center gap-4 mt-8">
+             <button className="bg-[#1A1A1A] text-white px-8 py-4 rounded-full font-medium hover:bg-gray-800 transition-all flex items-center gap-2 group">
+              Explore Properties
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+             </button>
+             <div className="flex -space-x-3 items-center">
+                <img src={IMAGES.team1} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7]" alt="Agent" />
+                <img src={IMAGES.team2} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7]" alt="Agent" />
+                <img src={IMAGES.team3} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7]" alt="Agent" />
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold border-2 border-[#F9F9F7]">+4k</div>
+             </div>
+             <span className="text-sm font-medium text-gray-500 ml-2">Happy Clients</span>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Right Image */}
+      <motion.div 
+        initial={{ opacity: 0, clipPath: "inset(10% 10% 10% 10% round 40px)" }}
+        animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0% round 40px)" }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        className="flex-1 relative min-h-[500px]"
+      >
+        <img 
+          src={IMAGES.hero}
+          alt="Dubai Burj Al Arab"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        
+        {/* Floating Catalog Card */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="absolute bottom-8 right-8 bg-white/80 backdrop-blur-xl p-5 rounded-[24px] flex items-center gap-5 shadow-2xl max-w-xs cursor-pointer hover:scale-105 transition-transform"
+        >
+          <div className="h-12 w-12 rounded-full bg-[#1A1A1A] flex items-center justify-center text-white">
+            <ArrowRight size={20} className="-rotate-45" />
+          </div>
+          <div className="text-left">
+             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">New Catalog</p>
+             <p className="text-base font-bold text-black leading-tight">Download Project <br/> Presentation PDF</p>
+          </div>
+        </motion.div>
       </motion.div>
-    </header>
+    </section>
   );
 };
 
-const PropertyCard = ({ property, index }) => {
+// --- COMPONENT: MARQUEE PARTNERS ---
+const MarqueeLogos = () => {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      viewport={{ once: true, margin: "-50px" }}
-      className="group relative w-[85vw] md:w-[35vw] flex-shrink-0 cursor-pointer"
-    >
-      <div className="aspect-[4/5] overflow-hidden mb-6 relative">
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500 z-10" />
-        <motion.img 
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          src={property.image} 
-          alt={property.title} 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute top-4 right-4 z-20 bg-white/10 backdrop-blur-md px-4 py-2 text-xs text-white uppercase tracking-widest border border-white/20 rounded-full">
-          {property.status}
+    <div className="py-12 border-y border-gray-200 overflow-hidden bg-white">
+      <motion.div 
+        className="flex gap-20 items-center whitespace-nowrap opacity-40 grayscale"
+        variants={MARQUEE_VARIANTS}
+        animate="animate"
+      >
+        {["EMAAR", "NAKHEEL", "MERAAS", "DAMAC", "SOBHA", "DUBAI HOLDING", "OMNIYAT", "ELLINGTON"].map((logo, i) => (
+          <span key={i} className="text-3xl font-serif font-bold tracking-widest">{logo}</span>
+        ))}
+        {["EMAAR", "NAKHEEL", "MERAAS", "DAMAC", "SOBHA", "DUBAI HOLDING", "OMNIYAT", "ELLINGTON"].map((logo, i) => (
+          <span key={`dup-${i}`} className="text-3xl font-serif font-bold tracking-widest">{logo}</span>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
+// --- COMPONENT: ADVANTAGE GRID (WHY DUBAI?) ---
+const AdvantageCard = ({ icon: Icon, title, desc }) => (
+  <div className="p-8 rounded-[32px] bg-white border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+    <div className="h-12 w-12 rounded-2xl bg-[#F9F9F7] flex items-center justify-center mb-6 group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
+      <Icon size={24} />
+    </div>
+    <h3 className="text-xl font-bold mb-3">{title}</h3>
+    <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+  </div>
+);
+
+const AdvantageSection = () => {
+  return (
+    <section className="py-24 px-4 md:px-12 bg-[#F9F9F7]">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-16">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">Explore Our Advantages</h3>
+          <h2 className="text-4xl md:text-5xl font-medium text-[#1A1A1A]">Why Dubai Stands Unrivalled?</h2>
         </div>
         
-        {/* HUD Trigger */}
-        <div className="absolute bottom-6 right-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0">
-             <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center">
-                <LucideArrowUpRight className="w-5 h-5" />
-             </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <AdvantageCard 
+            icon={Users} 
+            title="Diversity" 
+            desc="Approximately 90% of Dubai's population consists of foreigners, reflecting its rich multicultural environment." 
+          />
+          <AdvantageCard 
+            icon={Shield} 
+            title="Safety" 
+            desc="Dubai consistently leads global rankings as one of the safest cities worldwide according to Global Finance." 
+          />
+          <AdvantageCard 
+            icon={Coins} 
+            title="Stable Currency" 
+            desc="The dirham's exchange rate has been firmly pegged to the dollar for over 20 years, ensuring stability." 
+          />
+          <AdvantageCard 
+            icon={Globe} 
+            title="Visa Opportunities" 
+            desc="Investing in real estate (starting from AED 750,000) offers the possibility of obtaining a resident visa." 
+          />
         </div>
-      </div>
-      
-      <div className="flex justify-between items-start border-b border-black/10 pb-6 group-hover:border-black/30 transition-colors">
-        <div>
-          <h3 className="text-3xl font-serif mb-2 group-hover:italic transition-all duration-300">{property.title}</h3>
-          <div className="flex items-center gap-2 text-zinc-500 text-sm mb-4 font-light">
-            <LucideMapPin className="w-4 h-4" />
-            {property.location}
-          </div>
-          <div className="flex gap-4 text-xs text-zinc-400 uppercase tracking-wider">
-            <span className="flex items-center gap-1"><LucideBed className="w-3 h-3" /> {property.beds}</span>
-            <span className="flex items-center gap-1"><LucideBath className="w-3 h-3" /> {property.baths}</span>
-            <span className="flex items-center gap-1"><LucideMaximize className="w-3 h-3" /> {property.sqft}</span>
-          </div>
-        </div>
-        <div className="text-xl font-light tracking-wide font-serif">
-          {property.price}
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const FeaturedCollection = () => {
-    // Mock Data - In real app, fetch from Supabase
-    // Using high-res Unsplash images for editorial feel
-    const properties = [
-        {
-        id: 1,
-        title: "The Glass House",
-        location: "Beverly Hills, CA",
-        price: "$12.5M",
-        image: "https://images.unsplash.com/photo-1600596542815-27b88e54e60d?q=80&w=2600&auto=format&fit=crop",
-        beds: 5,
-        baths: 6,
-        sqft: "6,500",
-        status: "For Sale"
-        },
-        {
-        id: 2,
-        title: "Coastal Zenith",
-        location: "Malibu, CA",
-        price: "$28M",
-        image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2600&auto=format&fit=crop",
-        beds: 6,
-        baths: 8,
-        sqft: "8,200",
-        status: "Exclusive"
-        },
-        {
-        id: 3,
-        title: "Urban Sanctuary",
-        location: "Tribeca, NY",
-        price: "$8.9M",
-        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2600&auto=format&fit=crop",
-        beds: 3,
-        baths: 3.5,
-        sqft: "3,100",
-        status: "New"
-        },
-        {
-        id: 4,
-        title: "Alpine Retreat",
-        location: "Aspen, CO",
-        price: "$15.2M",
-        image: "https://images.unsplash.com/photo-1513584685908-2274fc0a0604?q=80&w=2600&auto=format&fit=crop",
-        beds: 5,
-        baths: 5,
-        sqft: "5,400",
-        status: "Sold"
-        }
-    ];
-
-  const carouselRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: carouselRef });
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-50%"]); // Horizontal scroll effect on vertical scroll if desired, but here we use native overflow for magnetic snap
-
-  return (
-    <section className="py-24 md:py-32 bg-alabaster overflow-hidden">
-      <div className="px-6 md:px-12 mb-16 flex flex-col md:flex-row justify-between items-end gap-8">
-        <div>
-          <span className="text-xs uppercase tracking-[0.2em] text-zinc-400 block mb-4">Curated Selection</span>
-          <h2 className="text-5xl md:text-7xl font-serif text-obsidian leading-none">Featured <br/> Residences</h2>
-        </div>
-        <MagneticButton className="hidden md:flex items-center gap-3 text-sm uppercase tracking-widest border border-black/10 px-6 py-3 rounded-full hover:bg-black hover:text-white transition-all duration-300">
-          View All <LucideArrowRight className="w-4 h-4" />
-        </MagneticButton>
-      </div>
-
-      <div ref={carouselRef} className="overflow-x-auto pb-12 hide-scrollbar pl-6 md:pl-12 snap-x snap-mandatory">
-        <motion.div 
-            className="flex gap-6 md:gap-12 w-max"
-            drag="x"
-            dragConstraints={{ right: 0, left: -1000 }} // Simple constraint example
-        >
-          {properties.map((property, index) => (
-            <div key={property.id} className="snap-center">
-                <PropertyCard property={property} index={index} />
-            </div>
-          ))}
-        </motion.div>
       </div>
     </section>
   );
 };
 
-const Footer = () => {
+// --- COMPONENT: PROCESS CIRCLES (SMART OWNERSHIP) ---
+const ProcessSection = () => {
   return (
-    <footer className="bg-obsidian text-alabaster py-24 px-6 md:px-12 border-t border-zinc-800">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-24">
-        <div className="md:col-span-5">
-          <h2 className="text-4xl font-serif mb-6 tracking-tighter">LUXE.ESTATE</h2>
-          <p className="text-zinc-400 max-w-sm mb-8 font-light text-lg">
-            Redefining luxury real estate through a lens of architectural excellence and curated living experiences.
-          </p>
-          <div className="flex gap-4 text-zinc-500">
-             {['Instagram', 'LinkedIn', 'Twitter'].map((social) => (
-                 <div key={social} className="px-4 py-2 border border-zinc-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all cursor-pointer text-xs uppercase tracking-widest">
-                     {social}
-                 </div>
-             ))}
+    <section className="py-24 bg-[#1A1A1A] text-white overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-4 md:px-12 text-center relative z-10">
+        <h2 className="text-4xl md:text-5xl font-medium mb-20">Path to Smart Ownership</h2>
+        
+        <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-0">
+          {/* Step 1 */}
+          <div className="w-64 h-64 rounded-full border border-white/20 flex flex-col items-center justify-center p-8 hover:bg-white/5 transition-colors cursor-default">
+             <h4 className="text-3xl font-bold mb-2">10%</h4>
+             <p className="text-white/60 text-sm">Initial Payment</p>
+          </div>
+          
+          {/* Connector */}
+          <div className="hidden md:block w-24 h-[1px] bg-white/20"></div>
+
+          {/* Step 2 (Highlighted) */}
+          <div className="w-80 h-80 rounded-full border-2 border-white flex flex-col items-center justify-center p-8 bg-white/5 backdrop-blur-sm shadow-[0_0_50px_rgba(255,255,255,0.1)] z-10">
+             <h4 className="text-2xl font-bold mb-2">5 Years</h4>
+             <p className="text-white/80 text-sm">Installment Plan</p>
+             <span className="mt-2 px-3 py-1 bg-white text-black text-xs font-bold rounded-full">0% Overpayment</span>
+          </div>
+
+          {/* Connector */}
+          <div className="hidden md:block w-24 h-[1px] bg-white/20"></div>
+
+          {/* Step 3 */}
+          <div className="w-64 h-64 rounded-full border border-white/20 flex flex-col items-center justify-center p-8 hover:bg-white/5 transition-colors cursor-default">
+             <h4 className="text-3xl font-bold mb-2">~15%</h4>
+             <p className="text-white/60 text-sm">Rental Income</p>
           </div>
         </div>
-        
-        <div className="md:col-span-2">
-          <h4 className="text-xs uppercase tracking-widest text-zinc-500 mb-6">Explore</h4>
-          <ul className="space-y-4 text-sm font-light text-zinc-300">
-            {['Buy Properties', 'Sell Your Home', 'New Developments', 'Market Reports'].map((item) => (
-                <li key={item} className="hover:text-white transition-colors cursor-pointer flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    {item}
-                </li>
-            ))}
-          </ul>
-        </div>
 
-        <div className="md:col-span-2">
-          <h4 className="text-xs uppercase tracking-widest text-zinc-500 mb-6">Company</h4>
-          <ul className="space-y-4 text-sm font-light text-zinc-300">
-             {['About Us', 'Agents', 'Careers', 'Contact'].map((item) => (
-                <li key={item} className="hover:text-white transition-colors cursor-pointer flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    {item}
-                </li>
-            ))}
-          </ul>
+        <div className="mt-20">
+           <button className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-200 transition-colors">
+             Download Full Guide
+           </button>
         </div>
+      </div>
+      
+      {/* Background Gradient */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-purple-900/20 blur-[120px] rounded-full pointer-events-none" />
+    </section>
+  );
+};
 
-        <div className="md:col-span-3">
-           <h4 className="text-xs uppercase tracking-widest text-zinc-500 mb-6">Newsletter</h4>
-           <div className="flex flex-col gap-4">
-             <input type="email" placeholder="Email Address" className="bg-transparent border-b border-zinc-700 pb-2 outline-none text-white w-full placeholder-zinc-600 font-light focus:border-white transition-colors" />
-             <button className="self-start text-xs uppercase tracking-widest hover:text-zinc-300 border border-zinc-700 px-6 py-3 rounded-full hover:bg-white hover:text-black transition-all">Subscribe</button>
+// --- COMPONENT: BENTO GRID ---
+const PropertyCard = ({ title, type, image, span }) => {
+  return (
+    <motion.div 
+      variants={FADE_UP}
+      className={`group relative rounded-[32px] overflow-hidden bg-gray-100 ${span} min-h-[300px] cursor-pointer`}
+    >
+      <img 
+        src={image} 
+        alt={title} 
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+      />
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-60 transition-opacity group-hover:opacity-40" />
+
+      <div className="absolute top-4 right-4 h-12 w-12 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 shadow-lg z-20">
+        <ArrowUpRight size={20} className="text-black" />
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 p-6 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+        <span className="text-xs font-bold tracking-widest opacity-80 uppercase mb-2 block">{type}</span>
+        <h3 className="text-2xl md:text-3xl font-medium leading-tight mb-2">{title}</h3>
+        <p className="text-white/70 text-sm opacity-0 group-hover:opacity-100 transition-opacity delay-100">Starting from AED 1.2M</p>
+      </div>
+    </motion.div>
+  );
+};
+
+const PropertyGrid = () => {
+  return (
+    <section className="py-24 px-4 md:px-12 bg-[#F9F9F7]">
+      <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+        <div>
+          <h2 className="text-4xl md:text-6xl font-medium text-[#1A1A1A] max-w-xl leading-[1.1]">
+            Discover Your Ideal <br /> Property Type
+          </h2>
+        </div>
+        <p className="text-gray-500 max-w-sm text-sm leading-relaxed">
+          From waterfront villas to sky-high penthouses, explore our curated selection of Dubai's finest real estate.
+        </p>
+      </div>
+
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[900px]"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={STAGGER_CHILDREN}
+      >
+        <PropertyCard 
+          span="md:col-span-1 md:row-span-1"
+          title="Luxury Villas"
+          type="01"
+          image={IMAGES.villa}
+        />
+        <PropertyCard 
+          span="md:col-span-1 md:row-span-2"
+          title="Penthouse Suites"
+          type="02"
+          image={IMAGES.penthouse}
+        />
+        <PropertyCard 
+          span="md:col-span-1 md:row-span-1"
+          title="Apartments"
+          type="03"
+          image={IMAGES.apartment}
+        />
+        <PropertyCard 
+          span="md:col-span-1 md:row-span-1"
+          title="Waterfront Homes"
+          type="04"
+          image={IMAGES.waterfront}
+        />
+        <PropertyCard 
+          span="md:col-span-1 md:row-span-1"
+          title="Golf Estates"
+          type="05"
+          image={IMAGES.golf}
+        />
+         <PropertyCard 
+          span="md:col-span-1 md:row-span-1"
+          title="Commercial"
+          type="06"
+          image={IMAGES.commercial}
+        />
+      </motion.div>
+    </section>
+  );
+};
+
+// --- COMPONENT: FOOTER ---
+const Footer = () => {
+  return (
+    <footer className="bg-[#1A1A1A] text-white pt-24 pb-12 rounded-t-[40px] mt-12 mx-2 md:mx-4 overflow-hidden relative">
+       <div className="absolute inset-0 opacity-10 pointer-events-none">
+         <img src={IMAGES.map} alt="Map" className="w-full h-full object-cover" />
+       </div>
+
+       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
+           <div>
+             <h2 className="text-5xl md:text-7xl font-medium mb-8">Build Your Future <br /> With Us</h2>
+             <div className="flex flex-col gap-4 max-w-md">
+               <div className="bg-white/10 backdrop-blur-md p-2 pl-6 rounded-full flex justify-between items-center border border-white/10">
+                 <input type="email" placeholder="Enter your email" className="bg-transparent outline-none w-full text-white placeholder:text-white/40" />
+                 <button className="bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-gray-200 transition-colors">
+                   Subscribe
+                 </button>
+               </div>
+               <p className="text-white/40 text-xs ml-6">Join 12,000+ subscribers for weekly market insights.</p>
+             </div>
            </div>
-        </div>
-      </div>
-      <div className="mt-24 pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between text-xs text-zinc-600 uppercase tracking-wider items-center gap-6">
-        <div>© 2024 Luxe Estate. All Rights Reserved.</div>
-        <div className="flex gap-8">
-          <span className="cursor-pointer hover:text-zinc-400">Privacy Policy</span>
-          <span className="cursor-pointer hover:text-zinc-400">Terms of Service</span>
-        </div>
-      </div>
+
+           <div className="grid grid-cols-2 gap-8">
+             <div>
+               <h4 className="text-gray-500 font-bold uppercase tracking-widest text-xs mb-6">Quick Navigation</h4>
+               <ul className="space-y-4 text-white/80">
+                 <li><a href="#" className="hover:text-white">Home</a></li>
+                 <li><a href="#" className="hover:text-white">Properties</a></li>
+                 <li><a href="#" className="hover:text-white">Areas</a></li>
+                 <li><a href="#" className="hover:text-white">Services</a></li>
+               </ul>
+             </div>
+             <div>
+               <h4 className="text-gray-500 font-bold uppercase tracking-widest text-xs mb-6">Contact</h4>
+               <ul className="space-y-4 text-white/80">
+                 <li>+971 4 123 4567</li>
+                 <li>hello@monte-estate.ae</li>
+                 <li>Downtown Dubai, Blvd Plaza, Tower 1</li>
+               </ul>
+               <div className="flex gap-4 mt-8">
+                 <div className="h-10 w-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-colors cursor-pointer"><Phone size={16} /></div>
+                 <div className="h-10 w-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-colors cursor-pointer"><MapPin size={16} /></div>
+               </div>
+             </div>
+           </div>
+         </div>
+
+         <div className="border-t border-white/10 pt-12 flex flex-col md:flex-row justify-between items-center text-xs text-white/40 uppercase tracking-widest gap-4">
+           <p>© 2024 Monte Real Estate</p>
+           <div className="flex gap-8">
+             <a href="#" className="hover:text-white">Privacy Policy</a>
+             <a href="#" className="hover:text-white">Terms of Service</a>
+           </div>
+         </div>
+       </div>
     </footer>
   );
 };
 
-const App = () => {
+// --- COMPONENT: FAQ ACCORDION ---
+const FAQItem = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div className="font-sans antialiased selection:bg-zinc-900 selection:text-white bg-alabaster">
-      <Navbar />
-      <Hero />
-      <FeaturedCollection />
-      <Footer />
+    <div className="border-b border-gray-200 py-6">
+      <button 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="w-full flex justify-between items-center text-left hover:text-gray-600 transition-colors"
+      >
+        <span className="text-lg font-medium text-[#1A1A1A] pr-8">{question}</span>
+        <div className={`flex-shrink-0 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center transition-all duration-300 ${isOpen ? 'rotate-45 bg-black text-white border-black' : 'text-gray-500'}`}>
+          <Plus size={16} />
+        </div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <p className="pt-4 text-gray-500 leading-relaxed pr-8 pb-4">
+              {answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-export default App;
+const FAQSection = () => {
+  return (
+    <section className="py-24 px-4 md:px-12 bg-[#F9F9F7] flex flex-col md:flex-row gap-16 max-w-7xl mx-auto">
+      <div className="md:w-1/3">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">Support</h3>
+        <h2 className="text-4xl font-medium text-[#1A1A1A] mb-6">Frequently Asked <br /> Questions</h2>
+        <p className="text-gray-500 leading-relaxed text-sm mb-8">
+          Find answers to common questions about buying, selling, and renting property in Dubai.
+        </p>
+        <button className="text-black font-bold underline decoration-2 underline-offset-4 hover:text-gray-600">
+          Contact Support
+        </button>
+      </div>
+      <div className="md:w-2/3">
+        <FAQItem 
+          question="Can foreign nationals buy property in Dubai?" 
+          answer="Yes, foreign nationals can buy property in Dubai in designated freehold areas. This grants them full ownership rights, including the ability to sell, lease, or occupy the property." 
+        />
+        <FAQItem 
+          question="What are the payment options available?" 
+          answer="Most developers offer flexible payment plans, often post-handover. You can also obtain mortgages from local banks if you meet the eligibility criteria." 
+        />
+        <FAQItem 
+          question="Is there a residency visa included?" 
+          answer="Investors purchasing property worth AED 750,000 or more may be eligible for a residency visa, subject to current government regulations." 
+        />
+        <FAQItem 
+          question="What is the ROI on Dubai properties?" 
+          answer="Dubai offers some of the highest rental yields in the world, typically ranging from 5% to 9% depending on the area and property type." 
+        />
+      </div>
+    </section>
+  );
+};
+
+// --- MAIN APP COMPONENT ---
+export default function App() {
+  return (
+    <div className="min-h-screen bg-[#F9F9F7] font-sans text-[#1A1A1A] overflow-x-hidden">
+       {/* Navbar */}
+       <nav className="flex justify-between items-center p-6 md:p-8 md:px-12 fixed w-full top-0 z-50 mix-blend-difference text-white">
+         <div className="flex items-center gap-2">
+           <div className="h-8 w-1 bg-white" />
+           <span className="font-serif text-xl tracking-widest font-bold">MONTE</span>
+         </div>
+         <div className="hidden md:flex gap-2">
+           <button className="h-12 w-12 border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors backdrop-blur-sm">
+             <Search size={18} />
+           </button>
+           <button className="h-12 w-12 border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors backdrop-blur-sm">
+             <Menu size={18} />
+           </button>
+         </div>
+       </nav>
+
+       <Hero />
+       <MarqueeLogos />
+       <AdvantageSection />
+       <PropertyGrid />
+       <ProcessSection />
+       <FAQSection />
+       <Footer />
+    </div>
+  );
+}
