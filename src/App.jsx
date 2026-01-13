@@ -12,28 +12,14 @@ const STAGGER_CHILDREN = {
   visible: { transition: { staggerChildren: 0.1 } }
 };
 
-const MARQUEE_VARIANTS = {
-  animate: {
-    x: [0, -1035],
-    transition: {
-      x: {
-        repeat: Infinity,
-        repeatType: "loop",
-        duration: 25,
-        ease: "linear",
-      },
-    },
-  },
-};
-
 // --- IMAGES ---
 const IMAGES = {
-  hero: "https://images.unsplash.com/photo-1512453979798-5ea904ac8489?q=80&w=2000&auto=format&fit=crop",
+  hero: "https://images.unsplash.com/photo-1546412414-e1885259563a?q=80&w=2600&auto=format&fit=crop",
   villa: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=2600&auto=format&fit=crop",
   penthouse: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2600&auto=format&fit=crop",
   apartment: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2600&auto=format&fit=crop",
   waterfront: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=2600&auto=format&fit=crop",
-  golf: "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?q=80&w=2600&auto=format&fit=crop",
+  golf: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=2600&auto=format&fit=crop", 
   commercial: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2600&auto=format&fit=crop",
   team1: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop",
   team2: "https://images.unsplash.com/photo-1573496359-136d4755f324?q=80&w=200&auto=format&fit=crop",
@@ -107,66 +93,97 @@ const Hero = () => {
   );
 };
 
-// --- COMPONENT: MARQUEE PARTNERS ---
-const MarqueeLogos = () => {
-  return (
-    <div className="py-12 border-y border-gray-200 overflow-hidden bg-white">
-      <motion.div 
-        className="flex gap-20 items-center whitespace-nowrap opacity-40 grayscale"
-        variants={MARQUEE_VARIANTS}
-        animate="animate"
-      >
-        {["EMAAR", "NAKHEEL", "MERAAS", "DAMAC", "SOBHA", "DUBAI HOLDING", "OMNIYAT", "ELLINGTON"].map((logo, i) => (
-          <span key={i} className="text-3xl font-serif font-bold tracking-widest">{logo}</span>
-        ))}
-        {["EMAAR", "NAKHEEL", "MERAAS", "DAMAC", "SOBHA", "DUBAI HOLDING", "OMNIYAT", "ELLINGTON"].map((logo, i) => (
-          <span key={`dup-${i}`} className="text-3xl font-serif font-bold tracking-widest">{logo}</span>
-        ))}
-      </motion.div>
-    </div>
-  );
-};
-
 // --- COMPONENT: ADVANTAGE GRID (WHY DUBAI?) ---
-const AdvantageCard = ({ icon: Icon, title, desc }) => (
-  <div className="p-8 rounded-[32px] bg-white border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-    <div className="h-12 w-12 rounded-2xl bg-[#F9F9F7] flex items-center justify-center mb-6 group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
+const AdvantageCard = ({ icon: Icon, title, desc, index }) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+    viewport={{ once: true }}
+    className="relative p-10 rounded-[3rem] bg-[#1a1a1a] text-white border border-gray-800 hover:border-gray-600 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-all duration-500 group overflow-hidden"
+  >
+    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none transform group-hover:scale-110 duration-700">
+       <Icon size={120} strokeWidth={1} />
+    </div>
+    
+    <div className="h-14 w-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center mb-8 text-white group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-inner">
       <Icon size={24} />
     </div>
-    <h3 className="text-xl font-bold mb-3">{title}</h3>
-    <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-  </div>
+    
+    <h3 className="text-2xl font-medium mb-4 tracking-tight">{title}</h3>
+    <p className="text-gray-400 text-sm leading-relaxed max-w-[85%] relative z-10">{desc}</p>
+    
+    <div className="absolute bottom-8 right-8 w-8 h-8 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
+        <ArrowUpRight size={14} />
+    </div>
+  </motion.div>
 );
 
 const AdvantageSection = () => {
   return (
-    <section className="py-24 px-4 md:px-12 bg-[#F9F9F7]">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-16">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">Explore Our Advantages</h3>
-          <h2 className="text-4xl md:text-5xl font-medium text-[#1A1A1A]">Why Dubai Stands Unrivalled?</h2>
+    <section className="py-32 px-4 md:px-12 bg-[#000000] text-white relative overflow-hidden">
+      {/* Abstract Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
+         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/30 rounded-full blur-[150px]" />
+         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-900/30 rounded-full blur-[150px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+            <div className="max-w-2xl">
+              <motion.h3 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-6 flex items-center gap-3"
+              >
+                <span className="w-6 h-[1px] bg-gray-500"></span>
+                Explore Our Advantages
+              </motion.h3>
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-5xl md:text-7xl font-medium leading-[0.95] tracking-tight"
+              >
+                Why Dubai Stands <br /> <span className="text-gray-500 italic font-serif">Unrivalled?</span>
+              </motion.h2>
+            </div>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-gray-400 max-w-sm text-sm leading-relaxed"
+            >
+              Discover a city where innovation meets tradition, offering a lifestyle of safety, stability, and limitless opportunity.
+            </motion.p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <AdvantageCard 
             icon={Users} 
-            title="Diversity" 
-            desc="Approximately 90% of Dubai's population consists of foreigners, reflecting its rich multicultural environment." 
+            title="Global Diversity" 
+            desc="Join a vibrant community where 90% of the population are global citizens, creating a rich multicultural tapestry." 
+            index={0}
           />
           <AdvantageCard 
             icon={Shield} 
-            title="Safety" 
-            desc="Dubai consistently leads global rankings as one of the safest cities worldwide according to Global Finance." 
+            title="World-Class Safety" 
+            desc="Experience peace of mind in one of the world's safest cities, consistently top-ranked for security and low crime rates." 
+            index={1}
           />
           <AdvantageCard 
             icon={Coins} 
-            title="Stable Currency" 
-            desc="The dirham's exchange rate has been firmly pegged to the dollar for over 20 years, ensuring stability." 
+            title="Economic Stability" 
+            desc="Invest with confidence. The AED is pegged to the USD, providing a stable financial environment for over two decades." 
+            index={2}
           />
           <AdvantageCard 
             icon={Globe} 
-            title="Visa Opportunities" 
-            desc="Investing in real estate (starting from AED 750,000) offers the possibility of obtaining a resident visa." 
+            title="Golden Visa" 
+            desc="Secure your future with long-term residency options for property investors, starting from AED 750k investments." 
+            index={3}
           />
         </div>
       </div>
@@ -460,7 +477,7 @@ export default function App() {
        </nav>
 
        <Hero />
-       <MarqueeLogos />
+       {/* Removed MarqueeLogos */}
        <AdvantageSection />
        <PropertyGrid />
        <ProcessSection />
