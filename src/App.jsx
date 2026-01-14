@@ -21,9 +21,9 @@ const IMAGES = {
   waterfront: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=2600&auto=format&fit=crop",
   golf: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=2600&auto=format&fit=crop", 
   commercial: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2600&auto=format&fit=crop",
-  team1: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop",
-  team2: "https://images.unsplash.com/photo-1573496359-136d4755f324?q=80&w=200&auto=format&fit=crop",
-  team3: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop",
+  team1: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+  team2: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop",
+  team3: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
   map: "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2600&auto=format&fit=crop" // Abstract map feel
 };
 
@@ -50,9 +50,9 @@ const Hero = () => {
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
              </button>
              <div className="flex -space-x-3 items-center">
-                <img src={IMAGES.team1} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7]" alt="Agent" />
-                <img src={IMAGES.team2} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7]" alt="Agent" />
-                <img src={IMAGES.team3} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7]" alt="Agent" />
+                <img src={IMAGES.team1} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7] object-cover bg-gray-300" alt="Agent" />
+                <img src={IMAGES.team2} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7] object-cover bg-gray-300" alt="Agent" />
+                <img src={IMAGES.team3} className="w-10 h-10 rounded-full border-2 border-[#F9F9F7] object-cover bg-gray-300" alt="Agent" />
                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold border-2 border-[#F9F9F7]">+4k</div>
              </div>
              <span className="text-sm font-medium text-gray-500 ml-2">Happy Clients</span>
@@ -100,20 +100,20 @@ const AdvantageCard = ({ icon: Icon, title, desc, index }) => (
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
     viewport={{ once: true }}
-    className="relative p-10 rounded-[3rem] bg-[#1a1a1a] text-white border border-gray-800 hover:border-gray-600 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-all duration-500 group overflow-hidden"
+    className="relative p-10 rounded-[3rem] bg-[#FFFFFF] text-[#1A1A1A] border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-500 group overflow-hidden"
   >
-    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none transform group-hover:scale-110 duration-700">
+    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none transform group-hover:scale-110 duration-700">
        <Icon size={120} strokeWidth={1} />
     </div>
     
-    <div className="h-14 w-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center mb-8 text-white group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-inner">
+    <div className="h-14 w-14 rounded-2xl bg-[#F9F9F7] flex items-center justify-center mb-8 text-[#1A1A1A] group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-300">
       <Icon size={24} />
     </div>
     
     <h3 className="text-2xl font-medium mb-4 tracking-tight">{title}</h3>
-    <p className="text-gray-400 text-sm leading-relaxed max-w-[85%] relative z-10">{desc}</p>
+    <p className="text-gray-500 text-sm leading-relaxed max-w-[85%] relative z-10">{desc}</p>
     
-    <div className="absolute bottom-8 right-8 w-8 h-8 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
+    <div className="absolute bottom-8 right-8 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
         <ArrowUpRight size={14} />
     </div>
   </motion.div>
@@ -121,11 +121,11 @@ const AdvantageCard = ({ icon: Icon, title, desc, index }) => (
 
 const AdvantageSection = () => {
   return (
-    <section className="py-32 px-4 md:px-12 bg-[#000000] text-white relative overflow-hidden">
-      {/* Abstract Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
-         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/30 rounded-full blur-[150px]" />
-         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-900/30 rounded-full blur-[150px]" />
+    <section className="py-32 px-4 md:px-12 bg-[#F9F9F7] relative overflow-hidden">
+      {/* Abstract Background Elements - Light Mode */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-40">
+         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-100/50 rounded-full blur-[150px]" />
+         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-100/50 rounded-full blur-[150px]" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -135,18 +135,18 @@ const AdvantageSection = () => {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6 }}
-                className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-6 flex items-center gap-3"
+                className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-6 flex items-center gap-3"
               >
-                <span className="w-6 h-[1px] bg-gray-500"></span>
+                <span className="w-6 h-[1px] bg-gray-400"></span>
                 Explore Our Advantages
               </motion.h3>
               <motion.h2 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-5xl md:text-7xl font-medium leading-[0.95] tracking-tight"
+                className="text-5xl md:text-7xl font-medium leading-[0.95] tracking-tight text-[#1A1A1A]"
               >
-                Why Dubai Stands <br /> <span className="text-gray-500 italic font-serif">Unrivalled?</span>
+                Why Dubai Stands <br /> <span className="text-gray-400 italic font-serif">Unrivalled?</span>
               </motion.h2>
             </div>
             
@@ -154,7 +154,7 @@ const AdvantageSection = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-gray-400 max-w-sm text-sm leading-relaxed"
+              className="text-gray-500 max-w-sm text-sm leading-relaxed"
             >
               Discover a city where innovation meets tradition, offering a lifestyle of safety, stability, and limitless opportunity.
             </motion.p>
@@ -163,26 +163,26 @@ const AdvantageSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <AdvantageCard 
             icon={Users} 
-            title="Global Diversity" 
-            desc="Join a vibrant community where 90% of the population are global citizens, creating a rich multicultural tapestry." 
+            title="Diversity" 
+            desc="Approximately 90% of Dubai's population consists of foreigners, reflecting its rich multicultural environment." 
             index={0}
           />
           <AdvantageCard 
             icon={Shield} 
-            title="World-Class Safety" 
-            desc="Experience peace of mind in one of the world's safest cities, consistently top-ranked for security and low crime rates." 
+            title="Safety" 
+            desc="Dubai consistently leads global rankings as one of the safest cities worldwide according to Global Finance." 
             index={1}
           />
           <AdvantageCard 
             icon={Coins} 
-            title="Economic Stability" 
-            desc="Invest with confidence. The AED is pegged to the USD, providing a stable financial environment for over two decades." 
+            title="Stable Currency" 
+            desc="The dirham's exchange rate has been firmly pegged to the dollar for over 20 years, ensuring stability." 
             index={2}
           />
           <AdvantageCard 
             icon={Globe} 
-            title="Golden Visa" 
-            desc="Secure your future with long-term residency options for property investors, starting from AED 750k investments." 
+            title="Visa Opportunities" 
+            desc="Investing in real estate (starting from AED 750,000) offers the possibility of obtaining a resident visa." 
             index={3}
           />
         </div>
@@ -251,16 +251,31 @@ const PropertyCard = ({ title, type, image, span }) => {
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
       />
       
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-60 transition-opacity group-hover:opacity-40" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 transition-all duration-500 group-hover:opacity-80" />
 
       <div className="absolute top-4 right-4 h-12 w-12 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 shadow-lg z-20">
         <ArrowUpRight size={20} className="text-black" />
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 p-6 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+      <div className="absolute bottom-0 left-0 right-0 p-6 text-white translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out">
         <span className="text-xs font-bold tracking-widest opacity-80 uppercase mb-2 block">{type}</span>
         <h3 className="text-2xl md:text-3xl font-medium leading-tight mb-2">{title}</h3>
-        <p className="text-white/70 text-sm opacity-0 group-hover:opacity-100 transition-opacity delay-100">Starting from AED 1.2M</p>
+        <p className="text-white/70 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">Starting from AED 1.2M</p>
+        
+        <div className="grid grid-cols-3 gap-2 border-t border-white/20 pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-150">
+           <div>
+             <p className="text-[10px] uppercase tracking-wider opacity-60 mb-1">Area</p>
+             <p className="text-sm font-medium">2,500 sqft</p>
+           </div>
+           <div>
+             <p className="text-[10px] uppercase tracking-wider opacity-60 mb-1">Rooms</p>
+             <p className="text-sm font-medium">3 - 5 Beds</p>
+           </div>
+           <div>
+             <p className="text-[10px] uppercase tracking-wider opacity-60 mb-1">Status</p>
+             <p className="text-sm font-medium">For Sale</p>
+           </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -281,7 +296,7 @@ const PropertyGrid = () => {
       </div>
 
       <motion.div 
-        className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[900px]"
+        className="grid grid-cols-1 md:grid-cols-3 gap-8"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
