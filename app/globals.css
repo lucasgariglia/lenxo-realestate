@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@theme {
+  /* The 700px Editorial Pivot */
+  --breakpoint-md: 700px;
+
+  /* Colors */
+  --color-obsidian: #000000; /* Strictly Black per GEMINI.md */
+  --color-alabaster: #FAFAFA; /* Strictly FAFAFA per GEMINI.md */
+  --color-zinc-950: #09090B;
+  --color-zinc-600: #52525B;
+  --color-zinc-300: #D1D5DB;
+  
+  /* Fonts - Mapped from Next.js Variables */
+  --font-display: var(--font-display); 
+  --font-sans: var(--font-sans);
+}
+
+/* Base Styles */
+body {
+  background-color: var(--color-obsidian);
+  color: var(--color-alabaster);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Hiding for Horizontal Lists */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

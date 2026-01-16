@@ -1,0 +1,31 @@
+
+
+> lux-estate@0.1.0 dev
+> next dev -p 3001
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://10.88.0.3:3001
+
+✓ Starting...
+✓ Ready in 1955ms
+○ Compiling / ...
+⨯ Error: Invalid src prop (https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at ignore-listed frames {
+  digest: '605144888@E231'
+}
+ GET / 500 in 5.1s (compile: 4.0s, render: 1100ms)
+⚠ Cross origin request detected from 3001-firebase-test-1768332896229.cluster-fbfjltn375c6wqxlhoehbz44sk.cloudworkstations.dev to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://10.88.0.3:3001
+
+✓ Starting...
+✓ Ready in 4.4s
+⚠ Cross origin request detected from 3001-firebase-test-1768332896229.cluster-fbfjltn375c6wqxlhoehbz44sk.cloudworkstations.dev to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET / 200 in 3.4s (compile: 2.4s, render: 1009ms)
+ GET / 200 in 219ms (compile: 85ms, render: 134ms)
