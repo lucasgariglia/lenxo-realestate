@@ -1,46 +1,25 @@
 'use client';
 
 import { Menu, Search, Heart, Lock } from 'lucide-react';
-import { useState, useEffect } from 'react';
 
 export default function Navbar() {
-  const [isDarkSection, setIsDarkSection] = useState(true);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      // Check the element at the center-top of the viewport (under the navbar)
-      // We use y=20 to be safely within the navbar height but hitting the content below
-      // (assuming navbar container is pointer-events-none)
-      const el = document.elementFromPoint(window.innerWidth / 2, 20);
-      
-      if (el) {
-        const section = el.closest('[data-theme]');
-        if (section) {
-          const theme = section.getAttribute('data-theme');
-          setIsDarkSection(theme === 'dark');
-        }
-      }
-    };
-
-    // Run once on mount to set initial state
-    handleScroll();
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // mix-blend-mode: difference logic
+  // The Logo is Pure White (#FFFFFF).
+  // - On Black (#000000) BG: White - 0 = White.
+  // - On White (#FFFFFF) BG: White - White = Black.
+  // This ensures 7:1 contrast automatically without JS listeners.
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
-      {/* Logo Mark - Independent & High Contrast - Scroll Aware */}
-      <div 
-        className={`flex flex-col pointer-events-auto transition-colors duration-500 ${isDarkSection ? 'text-white' : 'text-zinc-950'}`}
-      >
+    <nav className="fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none mix-blend-difference text-white">
+      
+      {/* Logo Mark */}
+      <div className="flex flex-col pointer-events-auto">
         <span className="text-2xl md:text-3xl font-display tracking-wider uppercase font-bold leading-none">Lenxo</span>
-        <span className={`text-[8px] md:text-[9px] font-sans uppercase tracking-[0.4em] opacity-80 pl-1 ${isDarkSection ? 'text-zinc-300' : 'text-zinc-800'}`}>Real Estate</span>
+        <span className="text-[8px] md:text-[9px] font-sans uppercase tracking-[0.4em] opacity-80 pl-1 text-zinc-300">Real Estate</span>
       </div>
 
-      {/* Right Side Actions - Minimal, No Container, Matching Color Logic */}
-      <div className={`pointer-events-auto flex items-center gap-6 transition-colors duration-500 ${isDarkSection ? 'text-white' : 'text-zinc-950'}`}>
+      {/* Right Side Actions */}
+      <div className="pointer-events-auto flex items-center gap-6">
         
         {/* Search Label (Desktop) */}
         <button className="hidden md:flex items-center gap-2 group">
@@ -48,21 +27,36 @@ export default function Navbar() {
           <span className="text-[10px] font-sans uppercase tracking-widest font-medium">Search</span>
         </button>
 
-        {/* Icons */}
+        {/* Icons Group */}
         <div className="flex items-center gap-4">
-            <button className="flex items-center justify-center hover:opacity-70 transition-opacity">
+            <button className="hidden md:flex items-center justify-center hover:opacity-70 transition-opacity">
                 <Heart size={18} strokeWidth={1.5} />
             </button>
 
-            <button className="flex items-center justify-center hover:opacity-70 transition-opacity">
+            <button className="hidden md:flex items-center justify-center hover:opacity-70 transition-opacity">
                 <Lock size={18} strokeWidth={1.5} />
             </button>
             
-            <button className={`w-12 h-12 rounded-full flex items-center justify-center hover:scale-105 transition-transform ml-2 shadow-lg ${isDarkSection ? 'bg-white text-zinc-950' : 'bg-zinc-950 text-white'}`}>
-                <Menu size={20} strokeWidth={1.5} />
+            {/* Menu Pill 
+                For the pill background, we cannot use mix-blend-mode difference on the background itself easily without affecting the content.
+                So we keep the text/icons in 'difference' mode (inherited) but might need to isolate the glass effect if it looks weird.
+                However, for this specific request, we prioritize the text contrast.
+                To maintain the glass effect *and* contrast is tricky with just CSS blend modes on one layer.
+                We will trust the text to invert, and keep the glass simple.
+            */}
+            <button 
+                className="
+                    backdrop-blur-md border border-white/20 px-5 py-2 rounded-full flex items-center gap-3 
+                    transition-all duration-300 ml-2 group
+                    bg-white/10 hover:bg-white/20
+                "
+            >
+                <span className="text-[10px] font-sans uppercase tracking-widest font-medium group-hover:tracking-[0.2em] transition-all">Menu</span>
+                <Menu size={16} strokeWidth={1.5} />
             </button>
         </div>
       </div>
     </nav>
   );
 }
+

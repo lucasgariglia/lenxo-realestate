@@ -6,11 +6,11 @@ import Image from 'next/image';
 import { useRef } from 'react';
 
 const CATEGORIES = [
-  { id: '1', label: 'Luxury Villas', count: 12, image: '/images/lux-listing-villa.jpg', colSpan: 'md:col-span-1' },
-  { id: '2', label: 'Penthouse Suites', count: 5, image: '/images/lux-listing-loft.jpg', colSpan: 'md:col-span-1' },
-  { id: '3', label: 'Waterfront Homes', count: 8, image: '/images/lux-listing-pool.jpg', colSpan: 'md:col-span-2' },
-  { id: '4', label: 'Investment', count: 24, image: '/images/lux-home-hero.jpg', colSpan: 'md:col-span-1' },
-  { id: '5', label: 'Off-Plan', count: 15, image: '/images/lux-listing-offplan.jpg', colSpan: 'md:col-span-1' } 
+  { id: '1', label: 'Luxury Villas', count: 12, image: '/images/lenxo-listing-villa.jpg', colSpan: 'md:col-span-1' },
+  { id: '2', label: 'Penthouse Suites', count: 5, image: '/images/lenxo-listing-loft.jpg', colSpan: 'md:col-span-1' },
+  { id: '3', label: 'Waterfront Homes', count: 8, image: '/images/lenxo-listing-pool.jpg', colSpan: 'md:col-span-2' },
+  { id: '4', label: 'Investment', count: 24, image: '/images/lenxo-home-hero.jpg', colSpan: 'md:col-span-1' },
+  { id: '5', label: 'Off-Plan', count: 15, image: '/images/lenxo-listing-offplan.jpg', colSpan: 'md:col-span-1' } 
 ];
 
 export default function PropertyTypeGrid() {
@@ -26,13 +26,15 @@ export default function PropertyTypeGrid() {
   const opacity = useTransform(scrollYProgress, [0, 0.4], [0.6, 1]);
 
   return (
-    <motion.section 
+    <section 
         data-theme="light"
         ref={containerRef}
-        style={{ scale, opacity }}
-        className="bg-alabaster py-24 px-4 md:px-12 origin-center"
+        className="bg-alabaster py-24 px-4 md:px-12"
     >
-      <div className="container mx-auto">
+      <motion.div 
+        style={{ scale, opacity }}
+        className="container mx-auto origin-center"
+      >
         <motion.div 
            initial={{ opacity: 0, y: 20 }}
            whileInView={{ opacity: 1, y: 0 }}
@@ -44,13 +46,12 @@ export default function PropertyTypeGrid() {
             </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-auto md:h-[800px] hover:hover:has-[:hover]:opacity-50 transition-opacity duration-500">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-auto md:h-[800px]">
             {CATEGORIES.map((cat, i) => (
                 <motion.div
                     key={cat.id}
                     className={`
                         relative group overflow-hidden rounded-2xl ${cat.colSpan} h-[300px] md:h-auto cursor-pointer
-                        hover:!opacity-100 transition-opacity duration-500
                     `}
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
@@ -88,7 +89,7 @@ export default function PropertyTypeGrid() {
                 </motion.div>
             ))}
         </div>
-      </div>
-    </motion.section>
+      </motion.div>
+    </section>
   );
 }

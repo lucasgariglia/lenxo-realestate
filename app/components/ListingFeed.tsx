@@ -7,14 +7,14 @@ import { useRef, useEffect, useState } from 'react';
 
 export default function ListingFeed() {
   const { properties, loading } = useProperties();
-  const [width, setWidth] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
     if (carouselRef.current) {
         setWidth(carouselRef.current.scrollWidth - carouselRef.current.offsetWidth);
     }
-  }, [properties]);
+  }, [properties, loading]);
 
   if (loading) {
     return (
@@ -25,7 +25,7 @@ export default function ListingFeed() {
   }
 
   return (
-    <section className="relative w-full min-h-screen py-24 md:py-32 bg-obsidian text-alabaster">
+    <section className="relative w-full min-h-screen py-24 md:py-32 bg-obsidian text-alabaster border-t border-zinc-900 overflow-hidden">
       <div className="container mx-auto px-4 md:px-12 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <motion.div
             initial="hidden"
@@ -44,7 +44,7 @@ export default function ListingFeed() {
             </motion.span>
             
             <h2 className="text-4xl md:text-6xl font-display text-white mb-2 leading-[0.9]">
-                <div className="overflow-hidden">
+                <div className="overflow-hidden pb-4">
                     <motion.span 
                         variants={{ hidden: { y: "100%" }, visible: { y: 0 } }}
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -55,12 +55,12 @@ export default function ListingFeed() {
                     <motion.span 
                         variants={{ hidden: { y: "100%" }, visible: { y: 0 } }}
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-                        className="inline-block italic text-zinc-300 ml-3"
+                        className="inline-block italic text-zinc-400 ml-3"
                     >
                         Living
                     </motion.span>
                 </div>
-                <div className="overflow-hidden">
+                <div className="overflow-hidden pb-4 -mt-4">
                     <motion.span 
                         variants={{ hidden: { y: "100%" }, visible: { y: 0 } }}
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
@@ -96,7 +96,7 @@ export default function ListingFeed() {
       {/* 
         Responsive Layout Logic:
         - Mobile (<700px): Vertical Stack (flex-col)
-        - Desktop (>=700px): Magnetic Drag Carousel (framer-motion)
+        - Desktop (>=700px): Horizontal Drag Carousel
       */}
       <div className="md:hidden flex flex-col gap-6 px-4">
         {properties.map((property) => (
@@ -104,22 +104,34 @@ export default function ListingFeed() {
         ))}
       </div>
 
-      <div ref={carouselRef} className="hidden md:block w-full overflow-hidden pl-12 cursor-grab active:cursor-grabbing">
+      {/* Horizontal Draggable Carousel (Desktop) */}
+      <div ref={carouselRef} className="hidden md:block w-full overflow-hidden pl-12 active:cursor-grabbing cursor-grab">
         <motion.div 
-            drag="x"
+            drag="x" 
             dragConstraints={{ right: 0, left: -width }}
             whileTap={{ cursor: "grabbing" }}
-            className="flex gap-12"
+            dragElastic={0.1}
+            dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }} // "Luxury" heavy physics
+            className="flex gap-8 pb-12 pr-[33vw]"
         >
             {properties.map((property) => (
-                <div key={property.id} className="min-w-max">
-                    <PropertyCard property={property} />
+                <div key={property.id} className="shrink-0 pointer-events-none"> 
+                    {/* pointer-events-none on wrapper to prevent image drag interference, 
+                        BUT we need clicks. 
+                        Actually PropertyCard handles clicks. 
+                        If we put pointer-events-none, we can't click the card.
+                        Framer Motion 'drag' usually handles this well.
+                        Let's remove pointer-events-none and rely on drag listener.
+                    */}
+                    <div className="pointer-events-auto">
+                         <PropertyCard property={property} />
+                    </div>
                 </div>
             ))}
             
              {/* Visual Endcap */}
-            <div className="min-w-[200px] flex items-center justify-center opacity-40">
-                <span className="text-xs font-sans tracking-[0.3em] uppercase rotate-90 whitespace-nowrap">View Collection</span>
+            <div className="shrink-0 min-w-[200px] flex items-center justify-center opacity-40">
+                <span className="text-xs font-sans tracking-[0.3em] uppercase rotate-90 whitespace-nowrap text-zinc-500">View Collection</span>
             </div>
         </motion.div>
       </div>

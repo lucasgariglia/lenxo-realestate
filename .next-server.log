@@ -1,0 +1,31 @@
+
+> lux-estate@0.1.0 dev
+> next dev -p 3000
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.88.0.3:3000
+
+✓ Starting...
+✓ Ready in 3.2s
+ GET / 200 in 3.0s (compile: 2.3s, render: 701ms)
+ GET / 200 in 177ms (compile: 25ms, render: 152ms)
+ GET / 200 in 947ms (compile: 73ms, render: 875ms)
+ GET / 200 in 1066ms (compile: 101ms, render: 965ms)
+ GET / 200 in 1100ms (compile: 52ms, render: 1049ms)
+ GET / 200 in 179ms (compile: 10ms, render: 169ms)
+✓ Compiled in 4.5s
+ GET / 200 in 627ms (compile: 190ms, render: 437ms)
+ GET / 200 in 142ms (compile: 12ms, render: 130ms)
+✓ Compiled in 230ms
+ GET / 200 in 737ms (compile: 223ms, render: 514ms)
+✓ Compiled in 320ms
+ GET / 200 in 658ms (compile: 163ms, render: 496ms)
+✓ Compiled in 330ms
+✓ Compiled in 510ms
+✓ Compiled in 766ms
+✓ Compiled in 451ms
+ GET / 200 in 855ms (compile: 163ms, render: 692ms)
+✓ Compiled in 270ms
+ GET / 200 in 3.3s (compile: 990ms, render: 2.3s)
+ GET / 200 in 134ms (compile: 11ms, render: 123ms)
