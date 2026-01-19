@@ -21,7 +21,7 @@ export function useProperties() {
             
             if (error) throw error;
             if (data) {
-                setProperties(data as any); // Casting for now as DB schema might vary
+                setProperties(data as Property[]); // Casting for now as DB schema might vary
             }
         } else {
             // Simulate network delay for "Loading" state UI dev

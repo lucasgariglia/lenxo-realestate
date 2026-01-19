@@ -1,34 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  /* The 700px Editorial Pivot */
-  --breakpoint-md: 700px;
-
-  /* Colors */
-  --color-obsidian: #000000; /* Strictly Black per GEMINI.md */
-  --color-alabaster: #FAFAFA; /* Strictly FAFAFA per GEMINI.md */
+  --color-obsidian: #000000;
+  --color-alabaster: #FAFAFA;
   --color-zinc-950: #09090B;
   --color-zinc-600: #52525B;
   --color-zinc-300: #D1D5DB;
   
-  /* Fonts - Mapped from Next.js Variables */
   --font-display: var(--font-display); 
   --font-sans: var(--font-sans);
 }
 
-/* Base Styles */
 body {
   background-color: var(--color-obsidian);
   color: var(--color-alabaster);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
 }
 
-/* Scrollbar Hiding for Horizontal Lists */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+/* Typography Utilities */
+.text-display {
+  font-family: var(--font-display);
 }
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+.text-sans {
+  font-family: var(--font-sans);
 }

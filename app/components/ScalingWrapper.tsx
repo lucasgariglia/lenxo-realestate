@@ -1,86 +1,45 @@
 'use client';
 
-import { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import React from 'react';
+import { useViewport } from '@/hooks/useViewport';
 
 interface ScalingWrapperProps {
   children: React.ReactNode;
+  width?: number;
+  height?: number; // Optional: If provided, wrapper will have a fixed (scaled) height
+  className?: string;
 }
 
-export default function ScalingWrapper({ children }: ScalingWrapperProps) {
-  const [isMounted, setIsMounted] = useState(false);
-  const [scale, setScale] = useState(1);
-  const [wrapperHeight, setWrapperHeight] = useState<number | 'auto'>('auto');
-  const contentRef = useRef<HTMLDivElement>(null);
+export default function ScalingWrapper({ children, width = 1600, height, className = "" }: ScalingWrapperProps) {
+  const { width: winWidth, isMobile, isMounted } = useViewport();
+  
+  if (!isMounted) return null;
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Use useLayoutEffect to prevent visual flash of unscaled content
-  useLayoutEffect(() => {
-    if (!isMounted) return;
-
-    const calculateScale = () => {
-      const viewportWidth = document.documentElement.clientWidth; // Excludes scrollbar
-      
-      // Pivot Logic: Only scale if >= 700px
-      // BASE DESIGN WIDTH: 1440px (Updated for balanced scaling on 2K monitors).
-      if (viewportWidth >= 700) {
-        const newScale = viewportWidth / 1440;
-        setScale(newScale);
-        
-        // Update wrapper height based on scaled content
-        if (contentRef.current) {
-            const contentHeight = contentRef.current.offsetHeight;
-            setWrapperHeight(contentHeight * newScale);
-        }
-      } else {
-        setScale(1);
-        setWrapperHeight('auto');
-      }
-    };
-
-    calculateScale();
-
-    // Observers
-    const resizeObserver = new ResizeObserver(() => calculateScale());
-    const mutationObserver = new MutationObserver(() => calculateScale());
-    
-    window.addEventListener('resize', calculateScale);
-    
-    if (contentRef.current) {
-        resizeObserver.observe(contentRef.current);
-        mutationObserver.observe(contentRef.current, { childList: true, subtree: true, attributes: true });
-    }
-
-    return () => {
-      window.removeEventListener('resize', calculateScale);
-      resizeObserver.disconnect();
-      mutationObserver.disconnect();
-    };
-  }, [isMounted]);
-
-  if (!isMounted) {
-    return <div className="w-full h-full opacity-0">{children}</div>;
-  }
-
-  const isDesktop = scale !== 1;
+  const scale = isMobile ? 1 : winWidth / width;
 
   return (
     <div 
-        className="w-full relative overflow-x-hidden bg-obsidian"
-        style={{ height: wrapperHeight }}
+      className={className}
+      style={{ 
+        height: height ? `${height * scale}px` : 'auto',
+        width: '100%',
+        overflow: 'visible',
+        position: 'relative'
+      }}
     >
-        <div
-            ref={contentRef}
-            className={`origin-top-left ${isDesktop ? 'absolute top-0 left-0' : 'relative w-full'}`}
-            style={{
-                width: isDesktop ? '1440px' : '100%',
-                transform: isDesktop ? `scale(${scale})` : 'none',
-            }}
-        >
-            {children}
-        </div>
+      <div
+        style={{
+          transform: isMobile ? 'none' : `scale(${scale})`,
+          transformOrigin: 'top center',
+          width: isMobile ? '100%' : `${width}px`,
+          height: height ? `${height}px` : 'auto',
+          position: isMobile ? 'relative' : 'absolute',
+          left: isMobile ? '0' : '50%',
+          marginLeft: isMobile ? '0' : `-${width / 2}px`,
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
